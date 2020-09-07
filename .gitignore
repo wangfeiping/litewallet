@@ -14,3 +14,7 @@
 .vscode
 *.xml
 .idea/*.xml
+build/
+litewallet-sources.jar
+litewallet.aar
+
