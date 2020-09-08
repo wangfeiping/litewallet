@@ -22,8 +22,8 @@ import (
 	tcrypto "github.com/tendermint/tendermint/crypto"
 	"github.com/tendermint/tendermint/crypto/armor"
 	"github.com/tendermint/tendermint/crypto/xsalsa20symmetric"
-	cmn "github.com/tendermint/tendermint/libs/common"
-	dbm "github.com/tendermint/tendermint/libs/db"
+	cmn "github.com/tendermint/tendermint/libs/os"
+	dbm "github.com/tendermint/tm-db"
 	"github.com/tyler-smith/go-bip39"
 )
 
@@ -189,7 +189,10 @@ func ListLocalAccount(rootDir string) string {
 	}
 	// List returns the keys from storage in alphabetical order.
 	var res []LocalInfo
-	iter := db.Iterator(nil, nil)
+	iter, err := db.Iterator(nil, nil)
+	if err != nil {
+		return err.Error()
+	}
 	defer iter.Close()
 	for ; iter.Valid(); iter.Next() {
 		key := string(iter.Key())
@@ -279,7 +282,10 @@ func FetchtoSign(rootDir, name, password string) (privKey *ecdsa.PrivateKey, err
 	if err != nil {
 		return nil, err
 	}
-	bs := db.Get(infoKey(name))
+	bs, err := db.Get(infoKey(name))
+	if err != nil {
+		return nil, err
+	}
 	if len(bs) == 0 {
 		return nil, keyerror.NewErrKeyNotFound(name)
 	}
