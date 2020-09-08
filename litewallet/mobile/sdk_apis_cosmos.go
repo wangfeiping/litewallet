@@ -1,6 +1,10 @@
 // Gomobile-based cosmos litewallet interface implementation.
 package litewallet
 
+import (
+	"github.com/QOSGroup/litewallet/litewallet/chains/cosmos"
+)
+
 //create account
 func CosmosCreateAccount(rootDir, name, password, seed string) string {
 	output := ""
@@ -72,8 +76,7 @@ func CosmosGetBondValidators(rootDir, node, chainID,
 
 //get all the validators
 func CosmosGetAllValidators(rootDir, node, chainID string) string {
-	output := ""
-	return output
+	return cosmos.CosmosGetAllValidators(rootDir, node, chainID)
 }
 
 //get all delegations from the delegator
