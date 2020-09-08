@@ -1,3 +1,4 @@
+// Gomobile-based cosmos litewallet interface implementation.
 package litewallet
 
 //create account

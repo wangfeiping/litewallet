@@ -9,6 +9,6 @@
 - github.com/tendermint/tendermint/libs/db  
   github.com/tendermint/tm-db  
 
-- github.com/cosmos/cosmos-sdk/crypto/keys/keyerror
-  removed?  
-  redefined: https://github.com/cosmos/cosmos-sdk/types/errors/errors.go
+- github.com/cosmos/cosmos-sdk/crypto/keys/keyerror  
+  redefined:  
+  github.com/cosmos/cosmos-sdk/types/errors/errors.go

@@ -9,7 +9,7 @@ import (
 	"math/big"
 	"strconv"
 
-	"github.com/QOSGroup/litewallet/litewallet/eth/contracts_erc20"
+	"github.com/QOSGroup/litewallet/litewallet/chains/eth/contracts_erc20"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"

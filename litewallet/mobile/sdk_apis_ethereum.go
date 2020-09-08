@@ -1,7 +1,7 @@
 // Gomobile-based ethereum litewallet interface implementation.
 package litewallet
 
-import "github.com/QOSGroup/litewallet/litewallet/eth"
+import "github.com/QOSGroup/litewallet/litewallet/chains/eth"
 
 func EthCreateAccount(rootDir, name, password, seed string) string {
 	output := eth.CreateAccount(rootDir, name, password, seed)
