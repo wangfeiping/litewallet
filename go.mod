@@ -5,7 +5,6 @@ go 1.12
 require (
 	github.com/btcsuite/btcd v0.21.0-beta
 	github.com/btcsuite/btcutil v1.0.2
-	github.com/confio/ics23-iavl v0.6.0 // indirect
 	github.com/cosmos/cosmos-sdk v0.34.4-0.20200829041113-200e88ba075b
 	github.com/ethereum/go-ethereum v1.9.20
 	github.com/tendermint/crypto v0.0.0-20191022145703-50d29ede1e15
