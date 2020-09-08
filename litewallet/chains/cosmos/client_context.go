@@ -7,7 +7,7 @@ import (
 
 func NewClientContext(rootDir, node, chainID string) client.Context {
 	ctx := client.Context{}
-	ctx.WithOutputFormat("json").
+	ctx = ctx.WithOutputFormat("json").
 		WithNodeURI(node).
 		WithChainID(chainID).
 		WithLegacyAmino(codec.New())
