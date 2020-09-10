@@ -3,9 +3,10 @@ module github.com/QOSGroup/litewallet
 go 1.14
 
 require (
+	github.com/QOSGroup/qbase v0.2.5
 	github.com/btcsuite/btcd v0.21.0-beta
 	github.com/btcsuite/btcutil v1.0.2
-	github.com/cosmos/cosmos-sdk v0.34.4-0.20200829041113-200e88ba075b
+	github.com/cosmos/cosmos-sdk v0.39.1
 	github.com/ethereum/go-ethereum v1.9.20
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.7.1
@@ -16,6 +17,6 @@ require (
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 )
 
-replace github.com/cosmos/cosmos-sdk => github.com/cosmos/cosmos-sdk v0.34.4-0.20200829041113-200e88ba075b
-
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
+
+replace github.com/cosmos/cosmos-sdk => github.com/wangfeiping/cosmos-sdk v0.34.4-m2

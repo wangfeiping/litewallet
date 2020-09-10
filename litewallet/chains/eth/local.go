@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/QOSGroup/litewallet/litewallet/types"
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -267,7 +267,7 @@ func decryptPrivKey(saltBytes []byte, encBytes []byte, passphrase string) (privK
 	key = tcrypto.Sha256(key) // Get 32 bytes
 	privKeyBytes, err := xsalsa20symmetric.DecryptSymmetric(encBytes, key)
 	if err != nil && err.Error() == "Ciphertext decryption failed" {
-		return privKey, sdkerrors.ErrWrongPassword
+		return privKey, types.ErrWrongPassword
 	} else if err != nil {
 		return privKey, err
 	}
@@ -287,7 +287,7 @@ func FetchtoSign(rootDir, name, password string) (privKey *ecdsa.PrivateKey, err
 		return nil, err
 	}
 	if len(bs) == 0 {
-		return nil, sdkerrors.ErrKeyNotFound
+		return nil, types.ErrKeyNotFound
 	}
 	//Close the db to release the lock
 	db.Close()
