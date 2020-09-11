@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"os"
 
-	litewallet "github.com/QOSGroup/litewallet/litewallet/mobile"
-
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/QOSGroup/litewallet/cmd/version"
+	litewallet "github.com/QOSGroup/litewallet/litewallet/mobile"
+	"github.com/QOSGroup/litewallet/litewallet/types"
 )
 
 func main() {
@@ -25,29 +25,29 @@ func main() {
 			return nil
 		},
 	}
-	// rootCmd.PersistentFlags().String(types.FlagHome, "$HOME/.coscli/", "home dir")
+	rootCmd.PersistentFlags().String(types.FlagHome, "$HOME/.coscli/", "home dir")
 
-	// cmdCreate := &cobra.Command{
-	// 	Use:   "create",
-	// 	Short: "Create an account",
-	// 	RunE:  doCreate,
-	// }
-	// cmdCreate.Flags().Int16P(types.FlagBitSize, "b", 0, "bit size of the mnemonic")
+	cmdCreate := &cobra.Command{
+		Use:   "create",
+		Short: "Create an account",
+		RunE:  doCreate,
+	}
+	cmdCreate.Flags().Int16P(types.FlagBitSize, "b", 0, "bit size of the mnemonic")
 
-	// cmdRecover := &cobra.Command{
-	// 	Use:   "recover",
-	// 	Short: "Recover an account from mnemonic",
-	// 	RunE:  doRecover,
-	// }
-	// cmdRecover.Flags().StringP(types.FlagName, "n", "", "name")
+	cmdRecover := &cobra.Command{
+		Use:   "recover",
+		Short: "Recover an account from mnemonic",
+		RunE:  doRecover,
+	}
+	cmdRecover.Flags().StringP(types.FlagName, "", "", "name")
 
 	cmdValidators := &cobra.Command{
 		Use:   "validators",
 		Short: "Get all validators",
 		RunE:  getAllValidators,
 	}
-	cmdValidators.Flags().StringP(flags.FlagNode, "n", "tcp://8.211.162.156:26657", "node address")
-	cmdValidators.Flags().StringP(flags.FlagChainID, "c", "stargate-1", "chain id")
+	cmdValidators.Flags().StringP(types.FlagNode, "n", "tcp://8.211.162.156:26657", "node address")
+	cmdValidators.Flags().StringP(types.FlagChainID, "c", "stargate-1", "chain id")
 
 	cmdVersion := &cobra.Command{
 		Use:   "version",
@@ -55,8 +55,7 @@ func main() {
 		RunE:  doVersion,
 	}
 	rootCmd.AddCommand(
-		// cmdCreate, cmdRecover,
-		cmdValidators, cmdVersion)
+		cmdCreate, cmdRecover, cmdValidators, cmdVersion)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
@@ -65,8 +64,8 @@ func main() {
 }
 
 func getAllValidators(cmd *cobra.Command, _ []string) error {
-	node := viper.GetString(flags.FlagNode)
-	chainID := viper.GetString(flags.FlagChainID)
+	node := viper.GetString(types.FlagNode)
+	chainID := viper.GetString(types.FlagChainID)
 	fmt.Println("node: ", node)
 	fmt.Println("chain id: ", chainID)
 	resp := litewallet.CosmosGetAllValidators("", node, chainID)
@@ -85,7 +84,7 @@ func doRecover(cmd *cobra.Command, _ []string) error {
 }
 
 func doVersion(_ *cobra.Command, _ []string) error {
-	// version.ShowVersion()
+	version.ShowVersion()
 	return nil
 }
 
