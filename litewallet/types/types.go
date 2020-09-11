@@ -14,7 +14,7 @@ var (
 
 type SeedOutput struct {
 	Seed  string `json:"seed"`
-	Error string `json:"error"`
+	Error string `json:"error,omitempty"`
 }
 
 type KeyOutput struct {
@@ -25,5 +25,5 @@ type KeyOutput struct {
 	PrivKeyArmor string `json:"priv_key_armor,omitempty"`
 	Seed         string `json:"seed,omitempty"`
 	Denom        string `json:"denom"`
-	Error        string `json:"error"`
+	Error        string `json:"error,omitempty"`
 }

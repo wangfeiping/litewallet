@@ -17,10 +17,15 @@ func CosmosCreateAccount(rootDir, name, passwd, seed string) string {
 	return string(bytes)
 }
 
-//recover key
-func CosmosRecoverKey(rootDir, name, password, seed string) string {
-	output := ""
-	return output
+// CosmosRecoverKey recover the account with name, password and mnemonic input
+func CosmosRecoverKey(rootDir, name, passwd, seed string) string {
+	acc, err := cosmos.CreateAccount(rootDir, name, passwd, seed)
+	if err != nil {
+		acc.Error = err.Error()
+	}
+	acc.Seed = ""
+	bytes, _ := json.Marshal(acc)
+	return string(bytes)
 }
 
 //update password

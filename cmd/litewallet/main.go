@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
 
+	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -50,9 +52,10 @@ func main() {
 	cmdValidators.Flags().StringP(types.FlagChainID, "c", "stargate-1", "chain id")
 
 	cmdVersion := &cobra.Command{
-		Use:   "version",
-		Short: "Show version info",
-		RunE:  doVersion,
+		Use:     "version",
+		Aliases: []string{"v", "V"},
+		Short:   "Show version info",
+		RunE:    doVersion,
 	}
 	rootCmd.AddCommand(
 		cmdCreate, cmdRecover, cmdValidators, cmdVersion)
@@ -93,7 +96,26 @@ func doCreate(_ *cobra.Command, _ []string) error {
 }
 
 func doRecover(cmd *cobra.Command, _ []string) error {
+	home := os.ExpandEnv(viper.GetString(types.FlagHome))
+	viper.Set(types.FlagHome, home)
+	name := viper.GetString(types.FlagName)
+	if name == "" {
+		return fmt.Errorf("please input the name")
+	}
+	buf := bufio.NewReader(cmd.InOrStdin())
+	passwd, err := input.GetPassword("> password:\n", buf)
+	if err != nil {
+		return err
+	}
+	mnem, err := input.GetString("mnemonic:", buf)
+	if err != nil {
+		return err
+	}
 
+	// var ko types.KeyOutput
+	fmt.Println("--- cosmos")
+	ret := litewallet.CosmosRecoverKey(home, name, passwd, mnem)
+	showJSONString(ret)
 	return nil
 }
 
