@@ -10,6 +10,6 @@ func NewClientContext(rootDir, node, chainID string) client.Context {
 	ctx = ctx.WithOutputFormat("json").
 		WithNodeURI(node).
 		WithChainID(chainID).
-		WithLegacyAmino(codec.New())
+		WithLegacyAmino(codec.NewLegacyAmino())
 	return ctx
 }
