@@ -2,13 +2,19 @@
 package litewallet
 
 import (
+	"encoding/json"
+
 	"github.com/QOSGroup/litewallet/litewallet/chains/cosmos"
 )
 
-//create account
-func CosmosCreateAccount(rootDir, name, password, seed string) string {
-	output := ""
-	return output
+// CosmosCreateAccount returns the account info that created with name, password and mnemonic input
+func CosmosCreateAccount(rootDir, name, passwd, seed string) string {
+	acc, err := cosmos.CreateAccount(rootDir, name, passwd, seed)
+	if err != nil {
+		acc.Error = err.Error()
+	}
+	bytes, _ := json.Marshal(acc)
+	return string(bytes)
 }
 
 //recover key

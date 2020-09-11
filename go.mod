@@ -3,10 +3,10 @@ module github.com/QOSGroup/litewallet
 go 1.14
 
 require (
-	github.com/QOSGroup/qbase v0.2.5
 	github.com/btcsuite/btcd v0.21.0-beta
 	github.com/btcsuite/btcutil v1.0.2
 	github.com/cosmos/cosmos-sdk v0.39.1
+	github.com/cosmos/go-bip39 v0.0.0-20180819234021-555e2067c45d
 	github.com/ethereum/go-ethereum v1.9.20
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/viper v1.7.1

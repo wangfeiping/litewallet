@@ -74,7 +74,21 @@ func getAllValidators(cmd *cobra.Command, _ []string) error {
 }
 
 func doCreate(_ *cobra.Command, _ []string) error {
+	home := os.ExpandEnv(viper.GetString(types.FlagHome))
+	viper.Set(types.FlagHome, home)
 
+	fmt.Println("do create...")
+	var seed types.SeedOutput
+	ret := litewallet.CreateSeed()
+	if err := json.Unmarshal([]byte(ret), &seed); err != nil {
+		fmt.Println("error: ", err)
+		return err
+	}
+
+	showJSONString(ret)
+	ret = litewallet.CosmosCreateAccount(home, "test", "12345678", seed.Seed)
+	fmt.Println("create account: ", ret)
+	showJSONString(ret)
 	return nil
 }
 
