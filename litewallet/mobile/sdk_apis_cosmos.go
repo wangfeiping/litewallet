@@ -23,7 +23,7 @@ func CosmosRecoverKey(rootDir, name, passwd, seed string) string {
 	if err != nil {
 		acc.Error = err.Error()
 	}
-	acc.Seed = ""
+	// acc.Seed = ""
 	bytes, _ := json.Marshal(acc)
 	return string(bytes)
 }
