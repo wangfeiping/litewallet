@@ -15,12 +15,15 @@ ldflags = -X github.com/QOSGroup/litewallet/cmd/version.Name=$(APP_NAME) \
 BUILD_FLAGS := -ldflags '$(ldflags)'
 
 .PHONY: all
-all: build
+all: aar
 
 .PHONY: build
 build: go.sum
 		go build -mod=readonly $(BUILD_FLAGS) -o ./build/$(APP_NAME) ./cmd/litewallet
 		@echo "build ok..."
+
+.PHONY: aar
+aar: build
 		gomobile bind --target=android -o ./build/$(APP_NAME).aar ./litewallet/mobile/
 		@echo "gomobile ok..."
 

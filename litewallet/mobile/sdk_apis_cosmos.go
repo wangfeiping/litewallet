@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/QOSGroup/litewallet/litewallet/chains/cosmos"
+	"github.com/QOSGroup/litewallet/litewallet/types"
 )
 
 // CosmosCreateAccount returns the account info that created with name, password and mnemonic input
@@ -34,10 +35,24 @@ func CosmosUpdateKey(rootDir, name, oldpass, newpass string) string {
 	return output
 }
 
-//get account info
+// CosmosGetAccount query account info from remote
 func CosmosGetAccount(rootDir, node, chainID, addr string) string {
-	output := ""
-	return output
+	acc, coins, err := cosmos.GetAccount(rootDir, node, chainID, addr)
+	if err != nil {
+		return err.Error()
+	}
+	balances := types.BankBalances{
+		Address:       acc.Address.String(),
+		PubKey:        acc.PubKey,
+		AccountNumber: acc.AccountNumber,
+		Sequence:      acc.Sequence,
+		Coins:         coins}
+	ab := types.AccountWithBalances{Value: balances}
+	output, err := json.Marshal(ab)
+	if err != nil {
+		return err.Error()
+	}
+	return string(output)
 }
 
 //transfer
@@ -87,7 +102,21 @@ func CosmosGetBondValidators(rootDir, node, chainID,
 
 //get all the validators
 func CosmosGetAllValidators(rootDir, node, chainID string) string {
-	return cosmos.CosmosGetAllValidators(rootDir, node, chainID)
+	validators, err := cosmos.GetAllValidators(rootDir, node, chainID)
+	if err != nil {
+		return err.Error()
+	}
+	var all []types.ValidatorWithShare
+	for _, validator := range validators {
+		vShare := types.ValidatorWithShare{Validator: validator}
+		all = append(all, vShare)
+	}
+
+	out, err := json.Marshal(all)
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }
 
 //get all delegations from the delegator

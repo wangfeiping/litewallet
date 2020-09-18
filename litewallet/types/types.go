@@ -2,6 +2,8 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 var (
@@ -26,4 +28,22 @@ type KeyOutput struct {
 	Seed         string `json:"seed,omitempty"`
 	Denom        string `json:"denom"`
 	Error        string `json:"error,omitempty"`
+}
+
+type ValidatorWithShare struct {
+	Validator      stakingtypes.Validator `json:"validator,omitempty"`
+	SelfBondShares string                 `json:"selfbond_shares,omitempty"`
+}
+
+type BankBalances struct {
+	Address       string    `json:"address,omitempty"`
+	PubKey        []byte    `json:"public_key,omitempty"`
+	AccountNumber uint64    `json:"account_number,omitempty"`
+	Sequence      uint64    `json:"sequence,omitempty"`
+	Coins         sdk.Coins `json:"coins,omitempty"`
+}
+
+type AccountWithBalances struct {
+	Type  string       `json:"type,omitempty"`
+	Value BankBalances `json:"value,omitempty"`
 }
