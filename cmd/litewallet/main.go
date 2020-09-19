@@ -44,6 +44,7 @@ func main() {
 	cmdRecover.Flags().StringP(types.FlagName, "", "", "name")
 
 	cmdQuery := buildQueryCMD()
+	cmdTx := buildTxCMD()
 
 	cmdVersion := &cobra.Command{
 		Use:     "version",
@@ -52,59 +53,12 @@ func main() {
 		RunE:    doVersion,
 	}
 	rootCmd.AddCommand(
-		cmdCreate, cmdRecover, cmdQuery, cmdVersion)
+		cmdCreate, cmdRecover, cmdQuery, cmdTx, cmdVersion)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(-1)
 	}
-}
-
-func buildQueryCMD() *cobra.Command {
-	cmdQuery := &cobra.Command{
-		Use:   "query",
-		Short: "Query for ...",
-	}
-
-	cmdValidators := &cobra.Command{
-		Use:   "validators",
-		Short: "Get all validators",
-		RunE:  getAllValidators,
-	}
-
-	cmdAccount := &cobra.Command{
-		Use:   "account [address]",
-		Short: "Get account",
-		Args:  cobra.ExactArgs(1),
-		RunE:  getAccount,
-	}
-
-	cmdQuery.AddCommand(cmdAccount, cmdValidators)
-	cmdQuery.PersistentFlags().StringP(types.FlagNode, "n", "tcp://8.211.162.156:26657", "node address")
-	cmdQuery.PersistentFlags().StringP(types.FlagChainID, "c", "stargate-1", "chain id")
-
-	return cmdQuery
-}
-
-func getAccount(cmd *cobra.Command, args []string) error {
-	node := viper.GetString(types.FlagNode)
-	chainID := viper.GetString(types.FlagChainID)
-	fmt.Println("node: ", node)
-	fmt.Println("chain id: ", chainID)
-	addr := args[0]
-	resp := litewallet.CosmosGetAccount("", node, chainID, addr)
-	fmt.Println("response: ", resp)
-	return nil
-}
-
-func getAllValidators(cmd *cobra.Command, _ []string) error {
-	node := viper.GetString(types.FlagNode)
-	chainID := viper.GetString(types.FlagChainID)
-	fmt.Println("node: ", node)
-	fmt.Println("chain id: ", chainID)
-	resp := litewallet.CosmosGetAllValidators("", node, chainID)
-	fmt.Println("response: ", resp)
-	return nil
 }
 
 func doCreate(_ *cobra.Command, _ []string) error {

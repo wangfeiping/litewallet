@@ -4,6 +4,8 @@ package litewallet
 import (
 	"encoding/json"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/QOSGroup/litewallet/litewallet/chains/cosmos"
 	"github.com/QOSGroup/litewallet/litewallet/types"
 )
@@ -35,9 +37,19 @@ func CosmosUpdateKey(rootDir, name, oldpass, newpass string) string {
 	return output
 }
 
-// CosmosGetAccount query account info from remote
+// CosmosGetAccount query account info & balances from remote
 func CosmosGetAccount(rootDir, node, chainID, addr string) string {
-	acc, coins, err := cosmos.GetAccount(rootDir, node, chainID, addr)
+	accAddr, err := sdk.AccAddressFromBech32(addr)
+	if err != nil {
+		return err.Error()
+	}
+
+	ctx := cosmos.NewClientContext(rootDir, node, chainID)
+	acc, err := cosmos.GetAccount(ctx, accAddr)
+	if err != nil {
+		return err.Error()
+	}
+	coins, err := cosmos.GetBalances(ctx, accAddr)
 	if err != nil {
 		return err.Error()
 	}
@@ -100,9 +112,10 @@ func CosmosGetBondValidators(rootDir, node, chainID,
 	return output
 }
 
-//get all the validators
+// CosmosGetAllValidators returns all the validators
 func CosmosGetAllValidators(rootDir, node, chainID string) string {
-	validators, err := cosmos.GetAllValidators(rootDir, node, chainID)
+	ctx := cosmos.NewClientContext(rootDir, node, chainID)
+	validators, err := cosmos.GetAllValidators(ctx)
 	if err != nil {
 		return err.Error()
 	}

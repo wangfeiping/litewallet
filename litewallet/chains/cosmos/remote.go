@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"github.com/cosmos/cosmos-sdk/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -13,51 +14,48 @@ import (
 )
 
 // GetAccount query account info from remote
-func GetAccount(rootDir, node, chainID,
-	addr string) (authtypes.BaseAccount, sdk.Coins, error) {
-	var acc authtypes.BaseAccount
-	accAddr, err := sdk.AccAddressFromBech32(addr)
-	if err != nil {
-		return acc, nil, err
-	}
-
-	clientCtx := NewClientContext(rootDir, node, chainID)
-	queryClient := authtypes.NewQueryClient(clientCtx)
+func GetAccount(ctx client.Context,
+	accAddr sdk.AccAddress) (acc authtypes.BaseAccount, err error) {
+	queryClient := authtypes.NewQueryClient(ctx)
 	res, err := queryClient.Account(context.Background(),
 		&authtypes.QueryAccountRequest{Address: accAddr})
 	if err != nil {
-		return acc, nil, err
+		return
 	}
 
-	out, err := clientCtx.JSONMarshaler.MarshalJSON(res.Account)
-	// out, err := res.Account.MarshalAmino()
+	out, err := ctx.JSONMarshaler.MarshalJSON(res.Account)
 	if err != nil {
-		return acc, nil, err
+		return
 	}
-	err = clientCtx.JSONMarshaler.UnmarshalJSON(out, &acc)
+	err = ctx.JSONMarshaler.UnmarshalJSON(out, &acc)
 	if err != nil && strings.Index(err.Error(), "unknown field") < 0 {
-		return acc, nil, err
+		return acc, err
 	}
-	bankQueryClient := banktypes.NewQueryClient(clientCtx)
+	return acc, nil
+}
+
+// GetBalances query account balances from remote
+func GetBalances(ctx client.Context,
+	accAddr sdk.AccAddress) (sdk.Coins, error) {
+	bankQueryClient := banktypes.NewQueryClient(ctx)
 	pageReq := &query.PageRequest{
 		Key:        []byte(""),
 		Offset:     0,
 		Limit:      100,
 		CountTotal: false}
 	params := types.NewQueryAllBalancesRequest(accAddr, pageReq)
-	resBalances, err := bankQueryClient.AllBalances(context.Background(), params)
+	res, err := bankQueryClient.AllBalances(context.Background(), params)
 	if err != nil {
-		return acc, nil, err
+		return nil, err
 	}
-	coins := append(resBalances.Balances, sdk.Coin{})
-	return acc, coins, nil
+	return res.Balances, nil
 }
 
 // GetAllValidators returns all the validators
-func GetAllValidators(rootDir, node, chainID string) (
+func GetAllValidators(ctx client.Context) (
 	stakingtypes.Validators, error) {
-	clientCtx := NewClientContext(rootDir, node, chainID)
-	resKVs, _, err := clientCtx.QuerySubspace(stakingtypes.ValidatorsKey, stakingtypes.StoreKey)
+	resKVs, _, err := ctx.QuerySubspace(
+		stakingtypes.ValidatorsKey, stakingtypes.StoreKey)
 	if err != nil {
 		return nil, err
 	}
