@@ -1,8 +1,13 @@
 package main
 
 import (
-	"github.com/QOSGroup/litewallet/litewallet/types"
+	"fmt"
+
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+
+	litewallet "github.com/QOSGroup/litewallet/litewallet/mobile"
+	"github.com/QOSGroup/litewallet/litewallet/types"
 )
 
 func buildTxCMD() *cobra.Command {
@@ -13,7 +18,7 @@ func buildTxCMD() *cobra.Command {
 
 	cmdTxSend := &cobra.Command{
 		Use:   "send [from_address] [to_address] [amount]",
-		Short: "Send funds from one account to another.",
+		Short: "Send funds from one account to another.(Tx build -> sign -> send)",
 		Args:  cobra.ExactArgs(3),
 		RunE:  doTxSend,
 	}
@@ -26,5 +31,17 @@ func buildTxCMD() *cobra.Command {
 }
 
 func doTxSend(cmd *cobra.Command, args []string) error {
+	node := viper.GetString(types.FlagNode)
+	chainID := viper.GetString(types.FlagChainID)
+	from := args[0]
+	to := args[1]
+	amount := args[2]
+	passwd := ""
+	fee := ""
+	broadcastMode := ""
+	fmt.Println("from: ", from, "; to: ", to, "; amount: ", amount)
+	resp := litewallet.CosmosTransfer("", node, chainID, from, passwd, to,
+		amount, fee, broadcastMode)
+	fmt.Println("response: ", resp)
 	return nil
 }

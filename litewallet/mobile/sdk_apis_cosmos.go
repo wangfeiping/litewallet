@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
 	"github.com/QOSGroup/litewallet/litewallet/chains/cosmos"
 	"github.com/QOSGroup/litewallet/litewallet/types"
@@ -68,11 +69,34 @@ func CosmosGetAccount(rootDir, node, chainID, addr string) string {
 }
 
 //transfer
-func CosmosTransfer(rootDir, node, chainId,
-	fromName, password, toStr,
-	coinStr, feeStr, broadcastMode string) string {
-	output := ""
-	return output
+func CosmosTransfer(rootDir, node, chainID,
+	accountName, passwd, toAddrStr,
+	amountStr, feeStr, broadcastMode string) string {
+	accAddr, err := sdk.AccAddressFromBech32(accountName)
+	if err != nil {
+		return err.Error()
+	}
+	toAccAddr, err := sdk.AccAddressFromBech32(toAddrStr)
+	if err != nil {
+		return err.Error()
+	}
+	funds, err := sdk.ParseCoins(amountStr)
+	if err != nil {
+		return err.Error()
+	}
+	ctx := cosmos.NewClientContext(rootDir, node, chainID).
+		WithFromAddress(accAddr)
+	msg := banktypes.NewMsgSend(ctx.GetFromAddress(), toAccAddr, funds)
+	if err := msg.ValidateBasic(); err != nil {
+		return err.Error()
+	}
+	err = cosmos.GenerateOrBroadcastTx(ctx, msg)
+	if err != nil {
+		return err.Error()
+	}
+	return ""
+	// output := ""
+	// return output
 }
 
 //delegate
