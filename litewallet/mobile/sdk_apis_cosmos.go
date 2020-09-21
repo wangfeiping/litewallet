@@ -115,13 +115,15 @@ func CosmosTransfer(rootDir, node, chainID,
 	if err := msg.ValidateBasic(); err != nil {
 		return err.Error()
 	}
-	err = cosmos.GenerateOrBroadcastTx(ctx, msg)
+	resp, err := cosmos.GenerateOrBroadcastTx(ctx, msg)
 	if err != nil {
 		return err.Error()
 	}
-	return ""
-	// output := ""
-	// return output
+	out, err := ctx.JSONMarshaler.MarshalJSON(resp)
+	if err != nil {
+		return err.Error()
+	}
+	return string(out)
 }
 
 //delegate

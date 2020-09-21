@@ -1,13 +1,12 @@
 package cosmos
 
 import (
-	"fmt"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-
+	sdktx "github.com/cosmos/cosmos-sdk/client/tx"
 	sdkkeyring "github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/simapp"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/spf13/viper"
@@ -30,7 +29,9 @@ func (b *blackBox) setPasswd(passwd string) {
 	b.passwd = passwd
 }
 func (b *blackBox) getPasswd() string {
-	return b.passwd
+	pw := b.passwd
+	b.passwd = ""
+	return pw
 }
 
 var box = blackBox{}
@@ -44,7 +45,6 @@ func NewKeyring() (sdkkeyring.Keyring, error) {
 
 	return sdkkeyring.NewFileKeyring(name, "", home,
 		func(_ string) (string, error) {
-			fmt.Println("passwd: ", box.getPasswd())
 			return box.getPasswd(), nil
 		})
 }
@@ -57,7 +57,8 @@ func NewClientContext(rootDir, node, chainID string) (client.Context, error) {
 	if err != nil {
 		return ctx, err
 	}
-	ctx = ctx.WithOutputFormat("json").
+	ctx = ctx.WithSkipConfirmation(true).
+		WithOutputFormat("json").
 		WithHomeDir(home).
 		WithLegacyAmino(encodingConfig.Amino).
 		WithJSONMarshaler(encodingConfig.Marshaler).
@@ -73,15 +74,19 @@ func NewClientContext(rootDir, node, chainID string) (client.Context, error) {
 // GenerateOrBroadcastTx will either generate
 // and sign it and broadcast it returning an error upon failure.
 //
+// reference:
 // github.com/cosmos/cosmos-sdk/client/tx/tx.go
 // func GenerateOrBroadcastTxCLI(...) error {
-func GenerateOrBroadcastTx(ctx client.Context, msgs ...types.Msg) error {
-	// github.com/cosmos/cosmos-sdk/client/tx/factory.go
-	// func NewFactoryCLI(...) Factory {
+func GenerateOrBroadcastTx(
+	ctx client.Context, msgs ...types.Msg,
+) (*sdk.TxResponse, error) {
 	txf := newFactoryCLI(ctx)
-	return tx.GenerateOrBroadcastTxWithFactory(ctx, txf, msgs...)
+	return GenerateOrBroadcastTxWithFactory(ctx, txf, msgs...)
 }
 
+// reference:
+// github.com/cosmos/cosmos-sdk/client/tx/factory.go
+// func NewFactoryCLI(...) Factory {
 func newFactoryCLI(ctx client.Context) tx.Factory {
 	// signModeStr := viper.GetString(flags.FlagSignMode)
 
@@ -124,4 +129,83 @@ func newFactoryCLI(ctx client.Context) tx.Factory {
 		WithGasPrices(gasPricesStr)
 
 	return f
+}
+
+// GenerateOrBroadcastTxWithFactory will either generate and print and unsigned transaction
+// or sign it and broadcast it returning an error upon failure.
+// reference:
+// github.com/cosmos/cosmos-sdk/client/tx/tx.go
+// func GenerateOrBroadcastTxWithFactory(...) error {
+func GenerateOrBroadcastTxWithFactory(
+	ctx client.Context, txf tx.Factory, msgs ...types.Msg,
+) (*sdk.TxResponse, error) {
+	// if clientCtx.GenerateOnly {
+	// 	return GenerateTx(clientCtx, txf, msgs...)
+	// }
+
+	return BroadcastTx(ctx, txf, msgs...)
+}
+
+// BroadcastTx attempts to generate, sign and broadcast a transaction with the
+// given set of messages. It will also simulate gas requirements if necessary.
+// It will return an error upon failure.
+//
+//
+// func BroadcastTx(...) error {
+func BroadcastTx(
+	ctx client.Context, txf tx.Factory, msgs ...types.Msg,
+) (res *sdk.TxResponse, err error) {
+	txf, err = sdktx.PrepareFactory(ctx, txf)
+	if err != nil {
+		return
+	}
+
+	// if txf.SimulateAndExecute() || ctx.Simulate {
+	// 	_, adjusted, err := sdktx.CalculateGas(ctx.QueryWithData, txf, msgs...)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+
+	// 	txf = txf.WithGas(adjusted)
+	// 	_, _ = fmt.Fprintf(os.Stderr, "%s\n", sdktx.GasEstimateResponse{GasEstimate: txf.Gas()})
+	// }
+
+	// if ctx.Simulate {
+	// 	return nil
+	// }
+
+	tx, err := sdktx.BuildUnsignedTx(txf, msgs...)
+	if err != nil {
+		return
+	}
+
+	// if !ctx.SkipConfirm {
+	// 	out, err := ctx.TxConfig.TxJSONEncoder()(tx.GetTx())
+	// 	if err != nil {
+	// 		return err
+	// 	}
+
+	// 	_, _ = fmt.Fprintf(os.Stderr, "%s\n\n", out)
+
+	// 	buf := bufio.NewReader(os.Stdin)
+	// 	ok, err := input.GetConfirmation("confirm transaction before signing and broadcasting", buf, os.Stderr)
+
+	// 	if err != nil || !ok {
+	// 		_, _ = fmt.Fprintf(os.Stderr, "%s\n", "cancelled transaction")
+	// 		return err
+	// 	}
+	// }
+
+	err = sdktx.Sign(txf, ctx.GetFromName(), tx)
+	if err != nil {
+		return
+	}
+
+	txBytes, err := ctx.TxConfig.TxEncoder()(tx.GetTx())
+	if err != nil {
+		return
+	}
+
+	// broadcast to a Tendermint node
+	return ctx.BroadcastTx(txBytes)
 }

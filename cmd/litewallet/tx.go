@@ -27,8 +27,6 @@ func buildTxCMD() *cobra.Command {
 	}
 
 	cmdTx.AddCommand(cmdTxSend)
-	cmdTx.PersistentFlags().StringP(types.FlagNode, "n", "tcp://8.211.162.156:26657", "node address")
-	cmdTx.PersistentFlags().StringP(types.FlagChainID, "c", "stargate-2", "chain id")
 
 	return cmdTx
 }
@@ -47,7 +45,7 @@ func doTxSend(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	fee := ""
-	broadcastMode := "sync"
+	broadcastMode := "block" // "sync" // "async"
 	fmt.Println("from: ", from, "; to: ", to, "; amount: ", amount)
 	resp := litewallet.CosmosTransfer(home, node, chainID,
 		from, passwd, to,

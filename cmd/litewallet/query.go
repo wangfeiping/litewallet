@@ -29,8 +29,6 @@ func buildQueryCMD() *cobra.Command {
 	}
 
 	cmdQuery.AddCommand(cmdAccount, cmdValidators)
-	cmdQuery.PersistentFlags().StringP(types.FlagNode, "n", "tcp://8.211.162.156:26657", "node address")
-	cmdQuery.PersistentFlags().StringP(types.FlagChainID, "c", "stargate-1", "chain id")
 
 	return cmdQuery
 }
