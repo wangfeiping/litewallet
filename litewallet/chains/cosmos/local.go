@@ -40,21 +40,24 @@ func CreateSeed() (string, error) {
 	return mnemonic, nil
 }
 
-// CreateAccount returns the account info that created with name, password and mnemonic input.
+// CreateAccount returns the account info that created with name, passwd and mnemonic input.
 func CreateAccount(rootDir, name,
-	password, seed string) (ko types.KeyOutput, err error) {
+	passwd, seed string) (ko types.KeyOutput, err error) {
 	viper.Set(types.FlagHome, rootDir)
-	kb := keyring.NewInMemory()
-
+	kb, err := NewKeyring()
+	if err != nil {
+		return
+	}
 	//check out the input
 	if name == "" {
 		err = types.ErrMissingName
 		return
 	}
-	if password == "" {
+	if passwd == "" {
 		err = types.ErrMissingPassword
 		return
 	}
+	SetPasswd(passwd)
 	// check if already exists
 	infos, err := kb.List()
 	for _, info := range infos {

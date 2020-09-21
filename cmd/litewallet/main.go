@@ -30,18 +30,19 @@ func main() {
 	rootCmd.PersistentFlags().String(types.FlagHome, "$HOME/.coscli/", "home dir")
 
 	cmdCreate := &cobra.Command{
-		Use:   "create",
+		Use:   "create [name]",
 		Short: "Create an account",
+		Args:  cobra.ExactArgs(1),
 		RunE:  doCreate,
 	}
 	cmdCreate.Flags().Int16P(types.FlagBitSize, "b", 0, "bit size of the mnemonic")
 
 	cmdRecover := &cobra.Command{
-		Use:   "recover",
+		Use:   "recover [name]",
 		Short: "Recover an account from mnemonic",
+		Args:  cobra.ExactArgs(1),
 		RunE:  doRecover,
 	}
-	cmdRecover.Flags().StringP(types.FlagName, "", "", "name")
 
 	cmdQuery := buildQueryCMD()
 	cmdTx := buildTxCMD()
@@ -61,32 +62,35 @@ func main() {
 	}
 }
 
-func doCreate(_ *cobra.Command, _ []string) error {
+func doCreate(cmd *cobra.Command, args []string) error {
 	home := os.ExpandEnv(viper.GetString(types.FlagHome))
 	viper.Set(types.FlagHome, home)
 
-	fmt.Println("do create...")
+	name := args[0]
+	fmt.Println("do create...name: ", name)
+	buf := bufio.NewReader(cmd.InOrStdin())
+	passwd, err := input.GetPassword("> password:\n", buf)
+	if err != nil {
+		return err
+	}
 	var seed types.SeedOutput
 	ret := litewallet.CreateSeed()
 	if err := json.Unmarshal([]byte(ret), &seed); err != nil {
 		fmt.Println("error: ", err)
 		return err
 	}
-
 	showJSONString(ret)
-	ret = litewallet.CosmosCreateAccount(home, "test", "12345678", seed.Seed)
+	ret = litewallet.CosmosCreateAccount(home, name, passwd, seed.Seed)
 	fmt.Println("create account: ", ret)
 	showJSONString(ret)
 	return nil
 }
 
-func doRecover(cmd *cobra.Command, _ []string) error {
+func doRecover(cmd *cobra.Command, args []string) error {
 	home := os.ExpandEnv(viper.GetString(types.FlagHome))
 	viper.Set(types.FlagHome, home)
-	name := viper.GetString(types.FlagName)
-	if name == "" {
-		return fmt.Errorf("please input the name")
-	}
+	name := args[0]
+	fmt.Println("do recover...name: ", name)
 	buf := bufio.NewReader(cmd.InOrStdin())
 	passwd, err := input.GetPassword("> password:\n", buf)
 	if err != nil {

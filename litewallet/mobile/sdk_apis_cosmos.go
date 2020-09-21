@@ -3,9 +3,11 @@ package litewallet
 
 import (
 	"encoding/json"
+	"fmt"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/client"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/spf13/viper"
 
 	"github.com/QOSGroup/litewallet/litewallet/chains/cosmos"
 	"github.com/QOSGroup/litewallet/litewallet/types"
@@ -40,12 +42,15 @@ func CosmosUpdateKey(rootDir, name, oldpass, newpass string) string {
 
 // CosmosGetAccount query account info & balances from remote
 func CosmosGetAccount(rootDir, node, chainID, addr string) string {
-	accAddr, err := sdk.AccAddressFromBech32(addr)
+	accAddr, err := types.AccAddressFromBech32(addr)
 	if err != nil {
 		return err.Error()
 	}
 
-	ctx := cosmos.NewClientContext(rootDir, node, chainID)
+	ctx, err := cosmos.NewClientContext(rootDir, node, chainID)
+	if err != nil {
+		return err.Error()
+	}
 	acc, err := cosmos.GetAccount(ctx, accAddr)
 	if err != nil {
 		return err.Error()
@@ -70,22 +75,42 @@ func CosmosGetAccount(rootDir, node, chainID, addr string) string {
 
 //transfer
 func CosmosTransfer(rootDir, node, chainID,
-	accountName, passwd, toAddrStr,
+	from, passwd, toAddrStr,
 	amountStr, feeStr, broadcastMode string) string {
-	accAddr, err := sdk.AccAddressFromBech32(accountName)
+	viper.Set(types.FlagHome, rootDir)
+	// accAddr, err := types.AccAddressFromBech32(accountName)
+	// if err != nil {
+	// 	return err.Error()
+	// }
+	toAccAddr, err := types.AccAddressFromBech32(toAddrStr)
 	if err != nil {
 		return err.Error()
 	}
-	toAccAddr, err := sdk.AccAddressFromBech32(toAddrStr)
+	funds, err := types.ParseCoins(amountStr)
 	if err != nil {
 		return err.Error()
 	}
-	funds, err := sdk.ParseCoins(amountStr)
+	ctx, err := cosmos.NewClientContext(rootDir, node, chainID)
 	if err != nil {
 		return err.Error()
 	}
-	ctx := cosmos.NewClientContext(rootDir, node, chainID).
-		WithFromAddress(accAddr)
+	ctx = ctx.WithBroadcastMode(broadcastMode)
+	cosmos.SetPasswd(passwd)
+	// info, err := ctx.Keyring.Key("test")
+	// if err != nil {
+	// 	return err.Error()
+	// }
+	// fmt.Println("info: ", info.GetAddress().String())
+
+	// ctx = ctx.WithFrom("test").WithFromAddress(accAddr).WithFromName("test")
+
+	fromAddr, fromName, err := client.GetFromFields(ctx.Keyring, from, ctx.GenerateOnly)
+	if err != nil {
+		return err.Error()
+	}
+	ctx = ctx.WithFrom(from).WithFromAddress(fromAddr).WithFromName(fromName)
+	fmt.Println("from: ", from, "; name: ", fromName, "; ", fromAddr.String())
+
 	msg := banktypes.NewMsgSend(ctx.GetFromAddress(), toAccAddr, funds)
 	if err := msg.ValidateBasic(); err != nil {
 		return err.Error()
@@ -138,7 +163,10 @@ func CosmosGetBondValidators(rootDir, node, chainID,
 
 // CosmosGetAllValidators returns all the validators
 func CosmosGetAllValidators(rootDir, node, chainID string) string {
-	ctx := cosmos.NewClientContext(rootDir, node, chainID)
+	ctx, err := cosmos.NewClientContext(rootDir, node, chainID)
+	if err != nil {
+		return err.Error()
+	}
 	validators, err := cosmos.GetAllValidators(ctx)
 	if err != nil {
 		return err.Error()

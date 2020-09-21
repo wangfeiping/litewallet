@@ -1,35 +1,73 @@
 package cosmos
 
 import (
+	"fmt"
+
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+
+	sdkkeyring "github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/simapp"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/spf13/viper"
+
+	"github.com/QOSGroup/litewallet/litewallet/types"
 )
 
 const (
-	signModeDirect    = "direct"
-	signModeAminoJSON = "amino-json"
+	name = "litewallet"
+
+// 	signModeDirect    = "direct"
+// 	signModeAminoJSON = "amino-json"
 )
 
-func NewClientContext(rootDir, node, chainID string) client.Context {
-	encodingConfig := simapp.MakeEncodingConfig()
+type blackBox struct {
+	passwd string
+}
+
+func (b *blackBox) setPasswd(passwd string) {
+	b.passwd = passwd
+}
+func (b *blackBox) getPasswd() string {
+	return b.passwd
+}
+
+var box = blackBox{}
+
+func SetPasswd(passwd string) {
+	box.setPasswd(passwd)
+}
+
+func NewKeyring() (sdkkeyring.Keyring, error) {
+	home := viper.GetString(types.FlagHome)
+
+	return sdkkeyring.NewFileKeyring(name, "", home,
+		func(_ string) (string, error) {
+			fmt.Println("passwd: ", box.getPasswd())
+			return box.getPasswd(), nil
+		})
+}
+
+func NewClientContext(rootDir, node, chainID string) (client.Context, error) {
+	home := viper.GetString(types.FlagHome)
 	ctx := client.Context{}
+	encodingConfig := simapp.MakeEncodingConfig()
+	keybase, err := NewKeyring()
+	if err != nil {
+		return ctx, err
+	}
 	ctx = ctx.WithOutputFormat("json").
-		// WithHomeDir("/tmp/").
+		WithHomeDir(home).
 		WithLegacyAmino(encodingConfig.Amino).
 		WithJSONMarshaler(encodingConfig.Marshaler).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
 		WithTxConfig(encodingConfig.TxConfig).
 		WithAccountRetriever(authtypes.AccountRetriever{}).
-		WithKeyring(keyring.NewInMemory()).
+		WithKeyring(keybase).
 		WithNodeURI(node).
 		WithChainID(chainID)
-	return ctx
+	return ctx, nil
 }
 
 // GenerateOrBroadcastTx will either generate
@@ -37,7 +75,7 @@ func NewClientContext(rootDir, node, chainID string) client.Context {
 //
 // github.com/cosmos/cosmos-sdk/client/tx/tx.go
 // func GenerateOrBroadcastTxCLI(...) error {
-func GenerateOrBroadcastTx(ctx client.Context, msgs ...sdk.Msg) error {
+func GenerateOrBroadcastTx(ctx client.Context, msgs ...types.Msg) error {
 	// github.com/cosmos/cosmos-sdk/client/tx/factory.go
 	// func NewFactoryCLI(...) Factory {
 	txf := newFactoryCLI(ctx)
@@ -68,7 +106,7 @@ func newFactoryCLI(ctx client.Context) tx.Factory {
 	gasPricesStr := ""
 	// gasStr := viper.GetString(flags.FlagGas)
 	gasStr := ""
-	gasSetting, _ := flags.ParseGasSetting(gasStr)
+	gasSetting, _ := types.ParseGasSetting(gasStr)
 
 	f := tx.Factory{}.WithTxConfig(ctx.TxConfig).
 		WithAccountRetriever(ctx.AccountRetriever).

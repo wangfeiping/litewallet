@@ -12,6 +12,14 @@ var (
 	FlagChainID = flags.FlagChainID
 	FlagName    = flags.FlagName
 	FlagBitSize = "bit-size"
+
+	AccAddressFromBech32 = sdk.AccAddressFromBech32
+	ParseCoins           = sdk.ParseCoins
+	ParseGasSetting      = flags.ParseGasSetting
+)
+
+type (
+	Msg = sdk.Msg
 )
 
 type SeedOutput struct {

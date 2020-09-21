@@ -3,6 +3,7 @@ module github.com/QOSGroup/litewallet
 go 1.14
 
 require (
+	github.com/99designs/keyring v1.1.5
 	github.com/btcsuite/btcd v0.21.0-beta
 	github.com/btcsuite/btcutil v1.0.2
 	github.com/cosmos/cosmos-sdk v0.39.1
@@ -20,4 +21,4 @@ require (
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
 
-replace github.com/cosmos/cosmos-sdk => github.com/wangfeiping/cosmos-sdk v0.34.4-m3
+replace github.com/cosmos/cosmos-sdk => github.com/wangfeiping/cosmos-sdk v0.34.4-m4

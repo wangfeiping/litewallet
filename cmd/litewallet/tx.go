@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 
+	"github.com/cosmos/cosmos-sdk/client/input"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -25,22 +28,29 @@ func buildTxCMD() *cobra.Command {
 
 	cmdTx.AddCommand(cmdTxSend)
 	cmdTx.PersistentFlags().StringP(types.FlagNode, "n", "tcp://8.211.162.156:26657", "node address")
-	cmdTx.PersistentFlags().StringP(types.FlagChainID, "c", "stargate-1", "chain id")
+	cmdTx.PersistentFlags().StringP(types.FlagChainID, "c", "stargate-2", "chain id")
 
 	return cmdTx
 }
 
 func doTxSend(cmd *cobra.Command, args []string) error {
+	home := os.ExpandEnv(viper.GetString(types.FlagHome))
+
 	node := viper.GetString(types.FlagNode)
 	chainID := viper.GetString(types.FlagChainID)
 	from := args[0]
 	to := args[1]
 	amount := args[2]
-	passwd := ""
+	buf := bufio.NewReader(cmd.InOrStdin())
+	passwd, err := input.GetPassword("> password:\n", buf)
+	if err != nil {
+		return err
+	}
 	fee := ""
-	broadcastMode := ""
+	broadcastMode := "sync"
 	fmt.Println("from: ", from, "; to: ", to, "; amount: ", amount)
-	resp := litewallet.CosmosTransfer("", node, chainID, from, passwd, to,
+	resp := litewallet.CosmosTransfer(home, node, chainID,
+		from, passwd, to,
 		amount, fee, broadcastMode)
 	fmt.Println("response: ", resp)
 	return nil
