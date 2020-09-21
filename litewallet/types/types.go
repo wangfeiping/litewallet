@@ -43,9 +43,14 @@ type ValidatorWithShare struct {
 	SelfBondShares string                 `json:"selfbond_shares,omitempty"`
 }
 
+type Pubkey struct {
+	Type  string `json:"type,omitempty"`
+	Value []byte `json:"value,omitempty"`
+}
+
 type BankBalances struct {
 	Address       string    `json:"address,omitempty"`
-	PubKey        []byte    `json:"public_key,omitempty"`
+	PubKey        Pubkey    `json:"public_key,omitempty"`
 	AccountNumber uint64    `json:"account_number,omitempty"`
 	Sequence      uint64    `json:"sequence,omitempty"`
 	Coins         sdk.Coins `json:"coins,omitempty"`

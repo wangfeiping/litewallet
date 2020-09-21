@@ -59,9 +59,15 @@ func CosmosGetAccount(rootDir, node, chainID, addr string) string {
 	if err != nil {
 		return err.Error()
 	}
+	var pub types.Pubkey
+	if acc.PubKey != nil {
+		pub = types.Pubkey{
+			Type:  acc.GetPubKey().Type(),
+			Value: acc.GetPubKey().Bytes()}
+	}
 	balances := types.BankBalances{
 		Address:       acc.Address.String(),
-		PubKey:        acc.PubKey,
+		PubKey:        pub,
 		AccountNumber: acc.AccountNumber,
 		Sequence:      acc.Sequence,
 		Coins:         coins}

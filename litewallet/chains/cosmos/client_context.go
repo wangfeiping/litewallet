@@ -50,7 +50,6 @@ func NewKeyring() (sdkkeyring.Keyring, error) {
 }
 
 func NewClientContext(rootDir, node, chainID string) (client.Context, error) {
-	home := viper.GetString(types.FlagHome)
 	ctx := client.Context{}
 	encodingConfig := simapp.MakeEncodingConfig()
 	keybase, err := NewKeyring()
@@ -59,7 +58,7 @@ func NewClientContext(rootDir, node, chainID string) (client.Context, error) {
 	}
 	ctx = ctx.WithSkipConfirmation(true).
 		WithOutputFormat("json").
-		WithHomeDir(home).
+		WithHomeDir(rootDir).
 		WithLegacyAmino(encodingConfig.Amino).
 		WithJSONMarshaler(encodingConfig.Marshaler).
 		WithInterfaceRegistry(encodingConfig.InterfaceRegistry).
