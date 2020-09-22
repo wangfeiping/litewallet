@@ -49,8 +49,8 @@ type Pubkey struct {
 }
 
 type BankBalances struct {
-	Address       string    `json:"address,omitempty"`
-	PubKey        Pubkey    `json:"public_key,omitempty"`
+	Address string `json:"address,omitempty"`
+	// PubKey        Pubkey    `json:"public_key,omitempty"`
 	AccountNumber uint64    `json:"account_number,omitempty"`
 	Sequence      uint64    `json:"sequence,omitempty"`
 	Coins         sdk.Coins `json:"coins,omitempty"`
