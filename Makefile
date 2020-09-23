@@ -8,7 +8,7 @@ APP_NAME=litewallet
 # TODO: Update the ldflags
 ldflags = -X github.com/QOSGroup/litewallet/cmd/version.Name=$(APP_NAME) \
 	-X github.com/QOSGroup/litewallet/cmd/version.Version=$(VERSION) \
-	-X "github.com/QOSGroup/litewallet/cmd/version.VersionCosmos=github.com/cosmos/cosmos-sdk stargate-2" \
+	-X "github.com/QOSGroup/litewallet/cmd/version.VersionCosmos=github.com/cosmos/cosmos-sdk stargate-3" \
 	-X "github.com/QOSGroup/litewallet/cmd/version.VersionEthereum=github.com/ethereum/go-ethereum v1.9.20" \
 	-X github.com/QOSGroup/litewallet/cmd/version.Commit=$(COMMIT) 
 

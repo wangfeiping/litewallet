@@ -29,7 +29,7 @@ func main() {
 	}
 	rootCmd.PersistentFlags().String(types.FlagHome, "$HOME/.coscli/", "home dir")
 	rootCmd.PersistentFlags().StringP(types.FlagNode, "n", "tcp://8.211.162.156:26657", "node address")
-	rootCmd.PersistentFlags().StringP(types.FlagChainID, "c", "stargate-2", "chain id")
+	rootCmd.PersistentFlags().StringP(types.FlagChainID, "c", "stargate-3a", "chain id")
 
 	cmdCreate := &cobra.Command{
 		Use:   "create [name]",
