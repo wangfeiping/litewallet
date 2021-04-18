@@ -110,7 +110,7 @@ func CosmosTransfer(rootDir, node, chainID,
 
 	// ctx = ctx.WithFrom("test").WithFromAddress(accAddr).WithFromName("test")
 
-	fromAddr, fromName, err := client.GetFromFields(ctx.Keyring, from, ctx.GenerateOnly)
+	fromAddr, fromName, _, err := client.GetFromFields(ctx.Keyring, from, ctx.GenerateOnly)
 	if err != nil {
 		return err.Error()
 	}
