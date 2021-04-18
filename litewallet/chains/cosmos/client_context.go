@@ -4,10 +4,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdktx "github.com/cosmos/cosmos-sdk/client/tx"
+	"github.com/cosmos/cosmos-sdk/codec"
+	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdkkeyring "github.com/cosmos/cosmos-sdk/crypto/keyring"
-	"github.com/cosmos/cosmos-sdk/simapp"
+	"github.com/cosmos/cosmos-sdk/simapp/params"
+	"github.com/cosmos/cosmos-sdk/std"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
+	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/spf13/viper"
 
@@ -49,9 +53,34 @@ func NewKeyring() (sdkkeyring.Keyring, error) {
 		})
 }
 
+// initEncodingConfig creates an EncodingConfig for an amino based test configuration.
+func initEncodingConfig() params.EncodingConfig {
+	amino := codec.NewLegacyAmino()
+	interfaceRegistry := codectypes.NewInterfaceRegistry()
+	marshaler := codec.NewProtoCodec(interfaceRegistry)
+	txCfg := authtx.NewTxConfig(marshaler, authtx.DefaultSignModes)
+
+	return params.EncodingConfig{
+		InterfaceRegistry: interfaceRegistry,
+		Marshaler:         marshaler,
+		TxConfig:          txCfg,
+		Amino:             amino,
+	}
+}
+
+// makeEncodingConfig creates an EncodingConfig for testing
+func makeEncodingConfig() params.EncodingConfig {
+	encodingConfig := initEncodingConfig()
+	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
+	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	// ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
+	// ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	return encodingConfig
+}
+
 func NewClientContext(rootDir, node, chainID string) (client.Context, error) {
 	ctx := client.Context{}
-	encodingConfig := simapp.MakeEncodingConfig()
+	encodingConfig := makeEncodingConfig()
 	keybase, err := NewKeyring()
 	if err != nil {
 		return ctx, err
