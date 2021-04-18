@@ -1,10 +1,20 @@
 # Litewallet SDK
 
+## Install gomobile
+
+``` plain
+$ go get -v golang.org/x/mobile/cmd/gomobile
+
+$ gomobile init
+```
+
 ## Build
 
+``` plain
 $ cd github.com/QOSGroup/litewallet/
 
 $ gomobile bind --target=android ./litewallet/mobile/
+```
 
 ## API
 
