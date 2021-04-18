@@ -54,21 +54,21 @@ func GetBalances(ctx client.Context,
 // GetAllValidators returns all the validators
 func GetAllValidators(ctx client.Context) (
 	stakingtypes.Validators, error) {
-	// resKVs, _, err := ctx.QuerySubspace(
-	// 	stakingtypes.ValidatorsKey, stakingtypes.StoreKey)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	resKVs, _, err := ctx.QuerySubspace(
+		stakingtypes.ValidatorsKey, stakingtypes.StoreKey)
+	if err != nil {
+		return nil, err
+	}
 
 	var all stakingtypes.Validators
-	// for _, kv := range resKVs {
-	// 	validator, err := stakingtypes.UnmarshalValidator(
-	// 		stakingtypes.ModuleCdc, kv.Value)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-	// 	all = append(all, validator)
-	// }
+	for _, kv := range resKVs {
+		validator, err := stakingtypes.UnmarshalValidator(
+			stakingtypes.ModuleCdc, kv.Value)
+		if err != nil {
+			return nil, err
+		}
+		all = append(all, validator)
+	}
 
 	return all, nil
 }
