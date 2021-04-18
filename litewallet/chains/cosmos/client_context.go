@@ -68,7 +68,10 @@ func initEncodingConfig() params.EncodingConfig {
 	}
 }
 
-// makeEncodingConfig creates an EncodingConfig for testing
+// reference:
+// https://github.com/cosmos/cosmos-sdk/blob/v0.42.4/simapp/encoding.go
+//
+// makeEncodingConfig creates an EncodingConfig for mobile-sdk
 func makeEncodingConfig() params.EncodingConfig {
 	encodingConfig := initEncodingConfig()
 	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
