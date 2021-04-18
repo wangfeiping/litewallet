@@ -227,7 +227,7 @@ func BroadcastTx(
 	// 	}
 	// }
 
-	err = sdktx.Sign(txf, ctx.GetFromName(), tx)
+	err = sdktx.Sign(txf, ctx.GetFromName(), tx, true)
 	if err != nil {
 		return
 	}
