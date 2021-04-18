@@ -67,7 +67,7 @@ func CosmosGetAccount(rootDir, node, chainID, addr string) string {
 	// }
 	balances := types.BankBalances{
 		// PubKey:        pub,
-		Address:       acc.Address.String(),
+		Address:       acc.Address,
 		AccountNumber: acc.AccountNumber,
 		Sequence:      acc.Sequence,
 		Coins:         coins}
