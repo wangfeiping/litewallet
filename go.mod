@@ -20,4 +20,4 @@ require (
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.2-alpha.regen.4
 
-replace github.com/cosmos/cosmos-sdk => github.com/wangfeiping/cosmos-sdk v0.42.4
+replace github.com/cosmos/cosmos-sdk => github.com/wangfeiping/cosmos-sdk v0.42.5-0.20210418085920-5649229dfd9b
