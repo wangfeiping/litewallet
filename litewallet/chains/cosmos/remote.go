@@ -18,7 +18,7 @@ func GetAccount(ctx client.Context,
 	accAddr sdk.AccAddress) (acc authtypes.BaseAccount, err error) {
 	queryClient := authtypes.NewQueryClient(ctx)
 	res, err := queryClient.Account(context.Background(),
-		&authtypes.QueryAccountRequest{Address: accAddr})
+		&authtypes.QueryAccountRequest{Address: accAddr.String()})
 	if err != nil {
 		return
 	}
