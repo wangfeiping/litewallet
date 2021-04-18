@@ -14,7 +14,7 @@ var (
 	FlagBitSize = "bit-size"
 
 	AccAddressFromBech32 = sdk.AccAddressFromBech32
-	ParseCoins           = sdk.ParseCoins
+	ParseCoins           = sdk.ParseCoinsNormalized
 	ParseGasSetting      = flags.ParseGasSetting
 )
 
