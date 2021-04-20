@@ -14,6 +14,7 @@ import (
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/spf13/viper"
+	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
 
 	"github.com/QOSGroup/litewallet/litewallet/types"
 )
@@ -88,6 +89,7 @@ func NewClientContext(rootDir, node, chainID string) (client.Context, error) {
 	if err != nil {
 		return ctx, err
 	}
+
 	ctx = ctx.WithSkipConfirmation(true).
 		WithOutputFormat("json").
 		WithHomeDir(rootDir).
@@ -99,7 +101,13 @@ func NewClientContext(rootDir, node, chainID string) (client.Context, error) {
 		WithKeyring(keybase).
 		WithNodeURI(node).
 		WithChainID(chainID)
-	return ctx, nil
+
+	client, err := rpchttp.New(node, "/websocket")
+	if err != nil {
+		return ctx, err
+	}
+
+	return ctx.WithClient(client), nil
 }
 
 // GenerateOrBroadcastTx will either generate

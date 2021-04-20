@@ -2,8 +2,8 @@ package types
 
 import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	"github.com/cosmos/cosmos-sdk/client/rpc"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 var (
@@ -39,8 +39,8 @@ type KeyOutput struct {
 }
 
 type ValidatorWithShare struct {
-	Validator      stakingtypes.Validator `json:"validator,omitempty"`
-	SelfBondShares string                 `json:"selfbond_shares,omitempty"`
+	Validator      rpc.ValidatorOutput `json:"validator,omitempty"`
+	SelfBondShares string              `json:"selfbond_shares,omitempty"`
 }
 
 type Pubkey struct {

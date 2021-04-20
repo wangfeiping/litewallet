@@ -5,12 +5,12 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/rpc"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/bank/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 // GetAccount query account info from remote
@@ -53,22 +53,15 @@ func GetBalances(ctx client.Context,
 
 // GetAllValidators returns all the validators
 func GetAllValidators(ctx client.Context) (
-	stakingtypes.Validators, error) {
-	resKVs, _, err := ctx.QuerySubspace(
-		stakingtypes.ValidatorsKey, stakingtypes.StoreKey)
+	[]rpc.ValidatorOutput, error) {
+	var height *int64
+	var page, limit *int
+
+	var all []rpc.ValidatorOutput
+	result, err := rpc.GetValidators(ctx, height, page, limit)
 	if err != nil {
-		return nil, err
+		return all, err
 	}
 
-	var all stakingtypes.Validators
-	for _, kv := range resKVs {
-		validator, err := stakingtypes.UnmarshalValidator(
-			stakingtypes.ModuleCdc, kv.Value)
-		if err != nil {
-			return nil, err
-		}
-		all = append(all, validator)
-	}
-
-	return all, nil
+	return result.Validators, nil
 }
