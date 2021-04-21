@@ -3,6 +3,8 @@
 ## Install gomobile
 
 ``` plain
+// install
+
 $ go get -v golang.org/x/mobile/cmd/gomobile
 
 $ gomobile init
@@ -11,6 +13,8 @@ $ gomobile init
 ## Build
 
 ``` plain
+// bind
+
 $ cd github.com/QOSGroup/litewallet/
 
 $ gomobile bind --target=android ./litewallet/mobile/
@@ -19,9 +23,12 @@ $ gomobile bind --target=android ./litewallet/mobile/
 ## API
 
 ``` sh
-//get all the validators
+// sdk_apis_cosmos.go
+
+// CosmosGetAllValidators
 
 $ ./gaiad query staking validators -o json
+$ ./gaiad query staking validators -o json --limit 200 --page 3
 ```
 
 ## too large could not be uploaded to github, use internal downloading server instead:
