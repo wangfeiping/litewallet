@@ -80,6 +80,10 @@ func makeEncodingConfig() params.EncodingConfig {
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	stakingtypes.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	stakingtypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	encodingConfig.Amino.RegisterConcrete(&types.ValidatorWithShare{},
+		"litewallet/ValidatorWithShare", nil)
+	encodingConfig.Amino.RegisterConcrete(types.ValidatorsWithShare{},
+		"litewallet/ValidatorsWithShare", nil)
 	// ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	// ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	return encodingConfig

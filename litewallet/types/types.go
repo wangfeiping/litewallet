@@ -1,7 +1,10 @@
 package types
 
 import (
+	"time"
+
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtype "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
@@ -38,10 +41,36 @@ type KeyOutput struct {
 	Error        string `json:"error,omitempty"`
 }
 
+// https://github.com/cosmos/cosmos-sdk/blob/v0.34.4/x/staking/types/validator.go
+// stakingtype.Validator不适用于移动端，因此自定义ValidatorWithShare 用于移动端
 type ValidatorWithShare struct {
-	Validator      stakingtype.Validator `json:"validator,omitempty"`
-	SelfBondShares string                `json:"selfbond_shares,omitempty"`
+	OperatorAddress   string                                 `json:"operator_address,omitempty"`
+	ConsensusPubkey   string                                 `json:"consensus_pubkey,omitempty"`
+	Jailed            bool                                   `json:"jailed,omitempty"`
+	Status            stakingtype.BondStatus                 `json:"status,omitempty"`
+	Tokens            github_com_cosmos_cosmos_sdk_types.Int `json:"tokens"`
+	DelegatorShares   github_com_cosmos_cosmos_sdk_types.Dec `json:"delegator_shares"`
+	Description       stakingtype.Description                `json:"description"`
+	UnbondingHeight   int64                                  `json:"unbonding_height,omitempty"`
+	UnbondingTime     time.Time                              `json:"unbonding_time"`
+	Commission        stakingtype.Commission                 `json:"commission"`
+	MinSelfDelegation github_com_cosmos_cosmos_sdk_types.Int `json:"min_self_delegation"`
+	SelfBondShares    string                                 `json:"selfbond_shares,omitempty"`
 }
+
+func (m *ValidatorWithShare) Reset()         { *m = ValidatorWithShare{} }
+func (*ValidatorWithShare) ProtoMessage()    {}
+func (m *ValidatorWithShare) String() string { return "" }
+
+func (m *ValidatorWithShare) Set(v *stakingtype.Validator) {
+	m.OperatorAddress = v.OperatorAddress
+}
+
+type ValidatorsWithShare []ValidatorWithShare
+
+func (ValidatorsWithShare) Reset()         {}
+func (ValidatorsWithShare) ProtoMessage()  {}
+func (ValidatorsWithShare) String() string { return "" }
 
 type Pubkey struct {
 	Type  string `json:"type,omitempty"`

@@ -179,14 +179,18 @@ func CosmosGetAllValidators(rootDir, node, chainID string) string {
 	if err != nil {
 		return err.Error()
 	}
-	// var all []types.ValidatorWithShare
-	// for _, validator := range validators {
-	// 	vShare := types.ValidatorWithShare{Validator: validator}
-	// 	fmt.Println("validator: ", validator.GetOperator().String(), "; ", validator.ConsensusPubkey.String())
-	// 	all = append(all, vShare)
-	// }
+	var all types.ValidatorsWithShare
+	for _, validator := range result.Validators {
+		vShare := types.ValidatorWithShare{}
+		// fmt.Println("validator: ",
+		// 	validator.GetOperator().String(), "; ",
+		// 	validator.ConsensusPubkey.String())
+		vShare.Set(&validator)
+		all = append(all, vShare)
+	}
 
-	out, err := ctx.JSONMarshaler.MarshalJSON(result)
+	// out, err := ctx.JSONMarshaler.MarshalJSON(all)
+	out, err := json.Marshal(all)
 	if err != nil {
 		return err.Error()
 	}

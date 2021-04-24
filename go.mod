@@ -8,6 +8,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.34.4-0.20200921130040-27db2cf89772
 	github.com/cosmos/go-bip39 v1.0.0
 	github.com/ethereum/go-ethereum v1.9.20
+	github.com/gogo/protobuf v1.3.3
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/viper v1.7.1
 	github.com/tendermint/crypto v0.0.0-20191022145703-50d29ede1e15
