@@ -5,12 +5,12 @@ import (
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/rpc"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/query"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/bank/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	stakingtype "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 // GetAccount query account info from remote
@@ -53,15 +53,24 @@ func GetBalances(ctx client.Context,
 
 // GetAllValidators returns all the validators
 func GetAllValidators(ctx client.Context) (
-	[]rpc.ValidatorOutput, error) {
-	var height *int64
-	var page, limit *int
+	// []stakingtype.Validator, error) {
+	*stakingtype.QueryValidatorsResponse, error) {
 
-	var all []rpc.ValidatorOutput
-	result, err := rpc.GetValidators(ctx, height, page, limit)
+	queryClient := stakingtype.NewQueryClient(ctx)
+	// pageReq, err := client.ReadPageRequest(cmd.Flags())
+	// if err != nil {
+	// 	return nil, err
+	// }
+	var pageReq *query.PageRequest
+
+	result, err := queryClient.Validators(context.Background(),
+		&stakingtype.QueryValidatorsRequest{
+			// Leaving status empty on purpose to query all validators.
+			Pagination: pageReq,
+		})
 	if err != nil {
-		return all, err
+		return nil, err
 	}
 
-	return result.Validators, nil
+	return result, nil
 }

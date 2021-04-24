@@ -13,6 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/spf13/viper"
 	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
 
@@ -77,6 +78,8 @@ func makeEncodingConfig() params.EncodingConfig {
 	encodingConfig := initEncodingConfig()
 	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
+	stakingtypes.RegisterLegacyAminoCodec(encodingConfig.Amino)
+	stakingtypes.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	// ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
 	// ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
 	return encodingConfig
@@ -85,6 +88,7 @@ func makeEncodingConfig() params.EncodingConfig {
 func NewClientContext(rootDir, node, chainID string) (client.Context, error) {
 	ctx := client.Context{}
 	encodingConfig := makeEncodingConfig()
+	// encodingConfig := simapp.MakeTestEncodingConfig()
 	keybase, err := NewKeyring()
 	if err != nil {
 		return ctx, err
