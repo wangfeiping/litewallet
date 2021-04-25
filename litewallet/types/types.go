@@ -1,9 +1,11 @@
 package types
 
 import (
+	ed25519 "crypto/ed25519"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
+	sdked25519 "github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
 	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	stakingtype "github.com/cosmos/cosmos-sdk/x/staking/types"
@@ -63,7 +65,19 @@ func (*ValidatorWithShare) ProtoMessage()    {}
 func (m *ValidatorWithShare) String() string { return "" }
 
 func (m *ValidatorWithShare) Set(v *stakingtype.Validator) {
+	pubKey := &sdked25519.PubKey{Key: (ed25519.PublicKey)(v.ConsensusPubkey.GetValue())}
+	m.Commission = v.Commission
+	m.ConsensusPubkey = pubKey.String()
+	m.DelegatorShares = v.DelegatorShares
+	m.Description = v.Description
+	m.Jailed = v.Jailed
+	m.MinSelfDelegation = v.MinSelfDelegation
 	m.OperatorAddress = v.OperatorAddress
+	// m.SelfBondShares
+	m.Status = v.Status
+	m.Tokens = v.Tokens
+	m.UnbondingHeight = v.UnbondingHeight
+	m.UnbondingTime = v.UnbondingTime
 }
 
 type ValidatorsWithShare []ValidatorWithShare
