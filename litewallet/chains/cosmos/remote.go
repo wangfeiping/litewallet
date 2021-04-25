@@ -61,7 +61,12 @@ func GetAllValidators(ctx client.Context) (
 	// if err != nil {
 	// 	return nil, err
 	// }
-	var pageReq *query.PageRequest
+	pageReq := &query.PageRequest{
+		// Key:        []byte(pageKey),
+		Offset:     0,
+		Limit:      300,
+		CountTotal: true,
+	}
 
 	result, err := queryClient.Validators(context.Background(),
 		&stakingtype.QueryValidatorsRequest{

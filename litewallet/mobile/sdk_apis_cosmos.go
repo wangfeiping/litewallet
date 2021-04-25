@@ -7,6 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/spf13/viper"
 
 	"github.com/QOSGroup/litewallet/litewallet/chains/cosmos"
@@ -181,12 +182,14 @@ func CosmosGetAllValidators(rootDir, node, chainID string) string {
 	}
 	var all types.ValidatorsWithShare
 	for _, validator := range result.Validators {
-		vShare := types.ValidatorWithShare{}
-		// fmt.Println("validator: ",
-		// 	validator.GetOperator().String(), "; ",
-		// 	validator.ConsensusPubkey.String())
-		vShare.Set(&validator)
-		all = append(all, vShare)
+		if validator.Status == stakingtypes.Bonded {
+			vShare := types.ValidatorWithShare{}
+			// fmt.Println("validator: ",
+			// 	validator.GetOperator().String(), "; ",
+			// 	validator.ConsensusPubkey.String())
+			vShare.Set(&validator)
+			all = append(all, vShare)
+		}
 	}
 
 	// out, err := ctx.JSONMarshaler.MarshalJSON(all)
