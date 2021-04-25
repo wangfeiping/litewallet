@@ -45,7 +45,8 @@ type KeyOutput struct {
 
 // https://github.com/cosmos/cosmos-sdk/blob/v0.34.4/x/staking/types/validator.go
 // stakingtype.Validator不适用于移动端，因此自定义ValidatorWithShare 用于移动端
-type ValidatorWithShare struct {
+
+type Validator struct {
 	OperatorAddress   string                                 `json:"operator_address,omitempty"`
 	ConsensusPubkey   string                                 `json:"consensus_pubkey,omitempty"`
 	Jailed            bool                                   `json:"jailed,omitempty"`
@@ -57,7 +58,11 @@ type ValidatorWithShare struct {
 	UnbondingTime     time.Time                              `json:"unbonding_time"`
 	Commission        stakingtype.Commission                 `json:"commission"`
 	MinSelfDelegation github_com_cosmos_cosmos_sdk_types.Int `json:"min_self_delegation"`
-	SelfBondShares    string                                 `json:"selfbond_shares,omitempty"`
+}
+
+type ValidatorWithShare struct {
+	Validator      *Validator `json:"validator,omitempty"`
+	SelfBondShares string     `json:"selfbond_shares,omitempty"`
 }
 
 func (m *ValidatorWithShare) Reset()         { *m = ValidatorWithShare{} }
@@ -66,18 +71,19 @@ func (m *ValidatorWithShare) String() string { return "" }
 
 func (m *ValidatorWithShare) Set(v *stakingtype.Validator) {
 	pubKey := &sdked25519.PubKey{Key: (ed25519.PublicKey)(v.ConsensusPubkey.GetValue())}
-	m.Commission = v.Commission
-	m.ConsensusPubkey = pubKey.String()
-	m.DelegatorShares = v.DelegatorShares
-	m.Description = v.Description
-	m.Jailed = v.Jailed
-	m.MinSelfDelegation = v.MinSelfDelegation
-	m.OperatorAddress = v.OperatorAddress
+	m.Validator = &Validator{
+		Commission:        v.Commission,
+		ConsensusPubkey:   pubKey.String(),
+		DelegatorShares:   v.DelegatorShares,
+		Description:       v.Description,
+		Jailed:            v.Jailed,
+		MinSelfDelegation: v.MinSelfDelegation,
+		OperatorAddress:   v.OperatorAddress,
+		Status:            v.Status,
+		Tokens:            v.Tokens,
+		UnbondingHeight:   v.UnbondingHeight,
+		UnbondingTime:     v.UnbondingTime}
 	// m.SelfBondShares
-	m.Status = v.Status
-	m.Tokens = v.Tokens
-	m.UnbondingHeight = v.UnbondingHeight
-	m.UnbondingTime = v.UnbondingTime
 }
 
 type ValidatorsWithShare []ValidatorWithShare
